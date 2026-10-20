@@ -1,0 +1,99 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Front Office — Alpha 5</title>
+<style>
+:root {
+  font-family:system-ui;
+  background:#090e16;
+  color:#f3f5f9;
+}
+* { box-sizing:border-box; }
+body { margin:0; }
+header {
+  padding:22px;
+  background:linear-gradient(115deg,#22160e,#131e2d);
+  border-bottom:3px solid #fb7625;
+}
+h1 { margin:0; font-size:27px; }
+small,.muted { color:#abb7c7; }
+main {
+  max-width:960px;
+  margin:auto;
+  padding:18px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+.panel,.stat {
+  background:#151f2d;
+  border:1px solid #334357;
+  border-radius:14px;
+  padding:18px;
+  margin:12px 0;
+}
+.stat strong {
+  display:block;
+  font-size:28px;
+}
+button {
+  background:#fa792a;
+  border:0;
+  border-radius:10px;
+  padding:13px 16px;
+  font-weight:800;
+  cursor:pointer;
+}
+button:disabled { opacity:.4; }
+table {
+  width:100%;
+  border-collapse:collapse;
+}
+td,th {
+  padding:10px 5px;
+  border-bottom:1px solid #334357;
+  text-align:left;
+  font-size:13px;
+}
+section { overflow:auto; }
+.pill {
+  background:#344255;
+  border-radius:8px;
+  padding:5px 9px;
+}
+nav {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+nav button {
+  background:#293649;
+  color:white;
+}
+nav button.active {
+  background:#fa792a;
+  color:#101722;
+}
+#notice { color:#fdbb87; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🐅 THE FRONT OFFICE</h1>
+  <small>
+    ALPHA 5 · Independent franchise prototype ·
+    Fictional ratings and schedule
+  </small>
+</header>
+<main>
+  <nav id="nav"></nav>
+  <div id="app"></div>
+</main>
+<script src="engine.js"></script>
+</body>
+</html>
