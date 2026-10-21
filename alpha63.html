@@ -1,0 +1,1405 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Front Office — Alpha 6.3</title>
+<style>
+:root{
+ --team:#fb4f14;
+ --bg:#080e17;
+ --panel:#172537;
+ --line:#394e66;
+ color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:var(--bg);
+ color:#f5f7fc;
+ font-family:system-ui,-apple-system,sans-serif;
+}
+header{
+ background:#0e1724;
+ border-bottom:3px solid var(--team);
+ padding:18px;
+}
+header h1{margin:0;font-size:25px}
+small,.muted{color:#b1c1d4}
+main{
+ max-width:1050px;
+ margin:auto;
+ padding:14px;
+}
+h2{margin:0 0 12px}
+h3{margin:12px 0}
+p{line-height:1.5}
+.card{
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:16px;
+ padding:17px;
+ margin:12px 0;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+}
+button,select{
+ font:inherit;
+ color:white;
+ background:#293d55;
+ border:1px solid #58708b;
+ border-radius:10px;
+ padding:12px;
+ cursor:pointer;
+}
+button:disabled{opacity:.4}
+button.primary,.active{
+ background:var(--team);
+ border-color:var(--team);
+ color:white;
+}
+select{width:100%}
+nav{
+ display:flex;
+ gap:8px;
+ overflow-x:auto;
+ padding:10px 0;
+}
+nav button{
+ white-space:nowrap;
+ font-size:13px;
+}
+.stat small{
+ display:block;
+ font-size:11px;
+}
+.stat b{
+ display:block;
+ font-size:24px;
+ margin-top:5px;
+}
+.notice{
+ background:#101d2c;
+ border-left:4px solid var(--team);
+ padding:12px;
+ border-radius:7px;
+ margin:12px 0;
+}
+.warning{
+ background:#322b25;
+ border-left:4px solid #f6b351;
+ padding:12px;
+ border-radius:7px;
+ font-size:13px;
+}
+.line{
+ padding:13px 0;
+ border-bottom:1px solid var(--line);
+}
+.line:last-child{border-bottom:0}
+.line button{margin:5px 4px 0 0}
+.pill{
+ display:inline-block;
+ background:#344861;
+ padding:4px 8px;
+ border-radius:7px;
+ font-size:12px;
+}
+.actions{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:9px;
+}
+.actions button{
+ min-height:65px;
+ text-align:left;
+}
+.bar{
+ height:9px;
+ background:#34445a;
+ border-radius:8px;
+ overflow:hidden;
+}
+.bar>div{
+ height:100%;
+ background:var(--team);
+}
+.office{
+ position:relative;
+ height:365px;
+ overflow:hidden;
+ border:2px solid #61758c;
+ border-radius:18px;
+ background:linear-gradient(
+  125deg,#344255,#101b2b
+ );
+ box-shadow:inset 0 0 60px #0009;
+}
+.window{
+ position:absolute;
+ left:5%;right:5%;top:5%;
+ height:67%;
+ border:11px solid #46586a;
+ background:linear-gradient(
+  #152b48,#e36c37 75%,#364e69
+ );
+ overflow:hidden;
+}
+.window:before{
+ content:"";
+ position:absolute;
+ left:49%;
+ top:0;bottom:0;
+ width:10px;
+ background:#46586a;
+ z-index:2;
+}
+.sun{
+ position:absolute;
+ right:17%;
+ top:12%;
+ width:65px;height:65px;
+ border-radius:50%;
+ background:#ffc578;
+ box-shadow:0 0 80px #ffb15e;
+}
+.city{
+ position:absolute;
+ bottom:0;left:0;right:0;
+ height:64%;
+ background:#152536;
+ clip-path:polygon(
+ 0 80%,5% 80%,5% 45%,
+ 12% 45%,12% 70%,17% 70%,
+ 17% 20%,24% 20%,24% 65%,
+ 29% 65%,29% 10%,35% 10%,
+ 35% 70%,40% 70%,40% 40%,
+ 46% 40%,46% 0,51% 0,
+ 51% 60%,57% 60%,57% 25%,
+ 64% 25%,64% 75%,70% 75%,
+ 70% 35%,77% 35%,77% 65%,
+ 83% 65%,83% 15%,90% 15%,
+ 90% 70%,95% 70%,95% 42%,
+ 100% 42%,100% 100%,0 100%);
+}
+.river{
+ position:absolute;
+ bottom:0;
+ width:100%;height:17%;
+ background:repeating-linear-gradient(
+  0deg,#25475d,#25475d 4px,
+  #34576b 6px
+ );
+}
+.bridge{
+ position:absolute;
+ bottom:14%;
+ left:3%;
+ width:94%;
+ height:55px;
+ border-top:5px solid #b5b9c0;
+ border-radius:50% 50% 0 0;
+ opacity:.8;
+}
+.wall-title{
+ position:absolute;
+ top:13px;left:20px;
+ color:white;
+ font-weight:900;
+ font-size:12px;
+ letter-spacing:2px;
+ text-shadow:0 2px 6px #000;
+}
+.desk{
+ position:absolute;
+ bottom:0;left:5%;
+ width:90%;height:85px;
+ background:linear-gradient(
+  #bb8552 0 12%,
+  #63402b 12% 100%
+ );
+ border-radius:9px 9px 0 0;
+ box-shadow:0 -9px 35px #0008;
+}
+.screen{
+ position:absolute;
+ bottom:92px;
+ left:37%;width:26%;height:90px;
+ background:#07111d;
+ border:8px solid #687c91;
+ border-radius:8px;
+ display:grid;
+ place-items:center;
+ font-size:27px;
+ font-weight:900;
+ color:var(--team);
+ box-shadow:0 6px 20px #000a;
+}
+.screen:after{
+ content:"";
+ position:absolute;
+ bottom:-21px;
+ height:16px;width:10px;
+ background:#687c91;
+}
+.office-hotspot{
+ position:absolute;
+ z-index:5;
+ border:1px solid #ffffff55;
+ background:#111c2cd9;
+ padding:8px;
+ border-radius:8px;
+ font-size:12px;
+}
+.office-hotspot:hover{
+ background:var(--team);
+}
+.hs-owner{right:5%;top:15%}
+.hs-roster{left:7%;bottom:100px}
+.hs-calendar{right:5%;bottom:100px}
+.hs-draft{left:36%;bottom:12px}
+.office-label{
+ margin:9px 0;
+ font-size:12px;
+ color:#b1c1d4;
+}
+@media(min-width:700px){
+ .office{height:430px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>🏈 THE FRONT OFFICE</h1>
+<small>ALPHA 6.3 · THE LEAGUE YEAR</small>
+</header>
+<main id="app"></main>
+<script>
+(()=>{
+'use strict';
+
+const KEY='frontoffice_alpha63_v1';
+const CAP=255;
+
+const TEAMS=[
+ ['ARI','Arizona Cardinals','#97233f'],
+ ['ATL','Atlanta Falcons','#a71930'],
+ ['BAL','Baltimore Ravens','#5a3a92'],
+ ['BUF','Buffalo Bills','#00338d'],
+ ['CAR','Carolina Panthers','#0085ca'],
+ ['CHI','Chicago Bears','#c83803'],
+ ['CIN','Cincinnati Bengals','#fb4f14'],
+ ['CLE','Cleveland Browns','#ff3c00'],
+ ['DAL','Dallas Cowboys','#003594'],
+ ['DEN','Denver Broncos','#fb4f14'],
+ ['DET','Detroit Lions','#0076b6'],
+ ['GB','Green Bay Packers','#203731'],
+ ['HOU','Houston Texans','#26758b'],
+ ['IND','Indianapolis Colts','#002c5f'],
+ ['JAX','Jacksonville Jaguars','#008e97'],
+ ['KC','Kansas City Chiefs','#e31837'],
+ ['LV','Las Vegas Raiders','#888888'],
+ ['LAC','Los Angeles Chargers','#0080c6'],
+ ['LAR','Los Angeles Rams','#003594'],
+ ['MIA','Miami Dolphins','#008e97'],
+ ['MIN','Minnesota Vikings','#4f2683'],
+ ['NE','New England Patriots','#002244'],
+ ['NO','New Orleans Saints','#b9a26c'],
+ ['NYG','New York Giants','#0b2265'],
+ ['NYJ','New York Jets','#125740'],
+ ['PHI','Philadelphia Eagles','#004c54'],
+ ['PIT','Pittsburgh Steelers','#d9a400'],
+ ['SF','San Francisco 49ers','#aa0000'],
+ ['SEA','Seattle Seahawks','#23779a'],
+ ['TB','Tampa Bay Buccaneers','#d50a0a'],
+ ['TEN','Tennessee Titans','#4b92db'],
+ ['WAS','Washington Commanders','#773141']
+];
+
+const POS=['QB','RB','WR','TE','OT','G',
+ 'C','EDGE','DT','LB','CB','S','K'];
+
+const PHASES=[
+ ['Evaluation','February',
+  'Review contracts and meet ownership'],
+ ['Free Agency','March',
+  'Negotiate with available players'],
+ ['Draft','April',
+  'Select rookies using your draft capital'],
+ ['OTAs','May–June',
+  'Develop the roster'],
+ ['Training Camp','July',
+  'Set priorities and develop players'],
+ ['Preseason','August',
+  'Evaluate the team before opening day'],
+ ['Regular Season','September–January',
+  'Play the 18-week NFL schedule'],
+ ['Playoffs','January–February',
+  'Compete for a championship'],
+ ['Season Review','February',
+  'Owner evaluates your performance']
+];
+
+const $=id=>document.getElementById(id);
+const get=id=>TEAMS.find(t=>t[0]===id);
+const rnd=(a,b)=>Math.floor(
+ Math.random()*(b-a+1))+a;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const money=n=>'$'+n.toFixed(1)+'M';
+
+let s=null;
+let tab='Office';
+let selected='CIN';
+let msg='';
+
+try{
+ const old=JSON.parse(localStorage.getItem(KEY));
+ if(old?.version===1&&old.roster)s=old;
+}catch(e){}
+
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(s));
+}
+
+function player(name,pos,ovr,salary,years){
+ return {
+  id:Math.random().toString(36).slice(2),
+  name,pos,ovr,salary,years,
+  morale:75,injury:0
+ };
+}
+
+function initialRoster(id){
+ const cin=[
+  ['Joe Burrow','QB',94,51,4],
+  ["Ja'Marr Chase",'WR',96,40,4],
+  ['Tee Higgins','WR',88,28,3],
+  ['Chase Brown','RB',84,5,2],
+  ['Orlando Brown Jr.','OT',83,16,2],
+  ['Amarius Mims','OT',81,5,3],
+  ['Trey Hendrickson','EDGE',90,28,1],
+  ['Logan Wilson','LB',84,13,2],
+  ['Cam Taylor-Britt','CB',80,4,1],
+  ['Evan McPherson','K',83,4,2]
+ ];
+ const generic=[
+  ['Franchise Quarterback','QB',85,32,3],
+  ['Lead Receiver','WR',86,22,3],
+  ['Running Back','RB',80,8,2],
+  ['Starting Tackle','OT',82,16,3],
+  ['Edge Rusher','EDGE',84,19,2],
+  ['Linebacker','LB',80,11,2],
+  ['Cornerback','CB',82,14,3],
+  ['Kicker','K',80,4,2]
+ ];
+ return (id==='CIN'?cin:generic)
+ .map(p=>player(...p));
+}
+
+function picksFor(year){
+ return Array.from({length:7},(_,i)=>({
+  id:Math.random().toString(36).slice(2),
+  year,round:i+1,origin:s.team
+ }));
+}
+
+function createSchedule(){
+ let ids=TEAMS.map(t=>t[0]);
+ let rounds=[];
+
+ for(let r=0;r<17;r++){
+  let games=[];
+  for(let i=0;i<16;i++){
+   games.push({
+    home:r%2?ids[i]:ids[31-i],
+    away:r%2?ids[31-i]:ids[i]
+   });
+  }
+  rounds.push(games);
+  ids.splice(1,0,ids.pop());
+ }
+
+ // Split one round into two half-weeks.
+ // Each club gets one bye across 18 weeks.
+ const split=rounds[8];
+ return [
+  ...rounds.slice(0,8),
+  split.slice(0,8),
+  split.slice(8),
+  ...rounds.slice(9)
+ ];
+}
+
+function newCareer(id){
+ s={
+  version:1,
+  team:id,
+  year:2026,
+  phase:0,
+  week:1,
+  owner:73,
+  reputation:50,
+  morale:72,
+  employed:true,
+  retired:false,
+  roster:initialRoster(id),
+  freeAgents:[],
+  picks:[],
+  deadCap:24,
+  schedule:createSchedule(),
+  games:[],
+  postseason:[],
+  legacy:[],
+  news:['You have accepted the GM position.'],
+  draftRound:1,
+  ratings:Object.fromEntries(
+   TEAMS.map(t=>[t[0],{
+    off:rnd(73,87),
+    def:rnd(73,87)
+   }])
+  )
+ };
+ s.picks=picksFor(2027);
+ generateFreeAgents();
+ tab='Office';
+ msg='Welcome to '+get(id)[1]+'.';
+ save();
+ render();
+}
+
+function generateFreeAgents(){
+ s.freeAgents=[];
+ for(let i=0;i<20;i++){
+  const pos=POS[i%POS.length];
+  const ovr=rnd(68,88);
+  s.freeAgents.push(
+   player(
+    ['Veteran','Prospect','Free Agent',
+     'Experienced'][i%4]+' '+
+    pos+' #'+(i+1),
+    pos,ovr,
+    Math.round((ovr-60)*.45*10)/10,
+    rnd(1,3)
+   )
+  );
+ }
+}
+
+function room(){
+ return CAP-s.deadCap-
+ s.roster.reduce((n,p)=>n+p.salary,0);
+}
+
+function needs(){
+ const targets={
+  QB:1,RB:2,WR:4,TE:2,
+  OT:2,G:2,C:1,
+  EDGE:3,DT:3,LB:3,
+  CB:4,S:2,K:1
+ };
+ return POS.map(pos=>{
+  const count=s.roster.filter(
+   p=>p.pos===pos).length;
+  return {
+   pos,count,
+   need:Math.max(0,targets[pos]-count)
+  };
+ }).sort((a,b)=>b.need-a.need);
+}
+
+function record(id){
+ let w=0,l=0,t=0;
+ for(const g of s.games){
+  if(g.home!==id&&g.away!==id)continue;
+  const a=g.home===id?g.hs:g.as;
+  const b=g.home===id?g.as:g.hs;
+  if(a>b)w++;
+  else if(a<b)l++;
+  else t++;
+ }
+ return {w,l,t,text:`${w}-${l}-${t}`};
+}
+
+function strength(id,side){
+ if(id!==s.team){
+  return s.ratings[id][side];
+ }
+ const relevant=side==='off'
+  ?['QB','RB','WR','TE','OT','G','C']
+  :['EDGE','DT','LB','CB','S'];
+
+ const group=s.roster.filter(
+  p=>relevant.includes(p.pos));
+
+ const avg=group.length
+  ?group.reduce((n,p)=>n+
+   p.ovr*(p.injury?0.65:1),0)/
+   group.length
+  :45;
+
+ const missing=needs()
+  .filter(n=>relevant.includes(n.pos))
+  .reduce((n,x)=>n+x.need,0);
+
+ return clamp(
+  avg-missing*1.4+(s.morale-70)*.07,
+  35,99
+ );
+}
+
+function drive(off,def){
+ const edge=off-def;
+ const roll=rnd(1,100);
+ const td=clamp(19+edge*.6,4,42);
+ const fg=clamp(17+edge*.1,8,27);
+ return roll<=td?7:roll<=td+fg?3:0;
+}
+
+function simulateGame(home,away){
+ let hs=0,as=0;
+ for(let i=0;i<9;i++){
+  hs+=drive(strength(home,'off')+2,
+   strength(away,'def'));
+  as+=drive(strength(away,'off'),
+   strength(home,'def'));
+ }
+ for(let i=0;i<3&&hs===as;i++){
+  hs+=drive(strength(home,'off'),
+   strength(away,'def'));
+  as+=drive(strength(away,'off'),
+   strength(home,'def'));
+ }
+ return {home,away,hs,as,week:s.week};
+}
+
+function advance(){
+ if(!s.employed)return;
+
+ if(s.phase===6){
+  simulateWeek();
+  return;
+ }
+
+ if(s.phase===2){
+  if(s.draftRound<=7){
+   msg='Finish your draft selections first.';
+   render();
+   return;
+  }
+ }
+
+ if(s.phase===8){
+  finishYear();
+  return;
+ }
+
+ s.phase++;
+
+ if(s.phase===6){
+  s.week=1;
+ }
+
+ if(s.phase===7){
+  beginPlayoffs();
+ }
+
+ msg='Advanced to '+PHASES[s.phase][0]+'.';
+ save();
+ render();
+}
+
+function simulateWeek(){
+ if(s.week>18)return;
+
+ const fixtures=s.schedule[s.week-1];
+
+ for(const f of fixtures){
+  const g=simulateGame(f.home,f.away);
+  s.games.push(g);
+
+  if(g.home===s.team||g.away===s.team){
+   const ours=g.home===s.team?g.hs:g.as;
+   const theirs=g.home===s.team?g.as:g.hs;
+   const win=ours>theirs;
+
+   s.owner=clamp(
+    s.owner+(win?3:-4),0,100);
+   s.morale=clamp(
+    s.morale+(win?2:-3),0,100);
+  }
+ }
+
+ s.roster.forEach(p=>{
+  if(p.injury>0)p.injury--;
+ });
+
+ if(rnd(1,100)<=12&&s.roster.length){
+  const p=s.roster[rnd(0,s.roster.length-1)];
+  p.injury=rnd(1,4);
+  s.news.unshift(p.name+' injured.');
+ }
+
+ s.week++;
+
+ if(s.week>18){
+  s.phase=7;
+  beginPlayoffs();
+  msg='Regular season complete.';
+ }else{
+  msg='Week '+(s.week-1)+' completed.';
+ }
+
+ save();
+ render();
+}
+
+function beginPlayoffs(){
+ const sorted=TEAMS.map(t=>({
+  id:t[0],r:record(t[0])
+ })).sort((a,b)=>
+  b.r.w-a.r.w||
+  b.r.t-a.r.t
+ );
+
+ const qualified=sorted.slice(0,14)
+  .map(x=>x.id);
+
+ s.postseason=[{
+  round:'Wild Card',
+  qualified,
+  champion:null
+ }];
+
+ if(!qualified.includes(s.team)){
+  msg='Your team missed the playoffs.';
+ }
+}
+
+function simulatePlayoffs(){
+ if(s.phase!==7)return;
+
+ const bracket=s.postseason[0];
+
+ if(!bracket){
+  s.phase=8;
+  save();render();return;
+ }
+
+ // Prototype playoff bracket:
+ // 14 qualifiers, advancing until champion.
+ const teams=bracket.qualified;
+
+ if(teams.length===1){
+  bracket.champion=teams[0];
+  s.phase=8;
+  msg='Champion: '+get(teams[0])[1];
+  save();render();return;
+ }
+
+ const next=[];
+ const shuffled=[...teams];
+
+ if(shuffled.length%2){
+  next.push(shuffled.shift());
+ }
+
+ while(shuffled.length>=2){
+  const a=shuffled.shift();
+  const b=shuffled.shift();
+  const g=simulateGame(a,b);
+  next.push(g.hs>=g.as?a:b);
+ }
+
+ bracket.qualified=next;
+ bracket.round=next.length<=2
+  ?'Super Bowl'
+  :'Playoff Round';
+
+ msg='Playoff round completed.';
+
+ if(next.length===1){
+  bracket.champion=next[0];
+  s.phase=8;
+  msg='Super Bowl champion: '+
+   get(next[0])[1];
+ }
+
+ save();render();
+}
+
+function finishYear(){
+ const r=record(s.team);
+
+ s.legacy.push({
+  year:s.year,
+  team:s.team,
+  record:r.text,
+  champion:s.postseason[0]?.champion===s.team
+ });
+
+ if(r.w<6){
+  s.owner=clamp(s.owner-12,0,100);
+ }
+
+ if(s.owner<30){
+  s.employed=false;
+  tab='Career';
+  msg='Ownership has fired you.';
+  save();render();return;
+ }
+
+ s.year++;
+ s.phase=0;
+ s.week=1;
+ s.games=[];
+ s.postseason=[];
+ s.schedule=createSchedule();
+ s.deadCap=12;
+
+ s.roster.forEach(p=>p.years--);
+ s.roster=s.roster.filter(p=>p.years>0);
+
+ s.picks=s.picks.filter(
+  p=>p.year>=s.year
+ );
+
+ const nextYear=s.year+1;
+
+ for(let r=1;r<=7;r++){
+  if(!s.picks.some(p=>
+   p.year===nextYear&&
+   p.round===r&&
+   p.origin===s.team
+  )){
+   s.picks.push({
+    id:Math.random().toString(36).slice(2),
+    year:nextYear,
+    round:r,
+    origin:s.team
+   });
+  }
+ }
+
+ s.draftRound=1;
+ generateFreeAgents();
+
+ msg='Welcome to the '+s.year+
+ ' league year.';
+ save();render();
+}
+
+function sign(i){
+ if(s.phase!==1)return;
+
+ const p=s.freeAgents[i];
+ if(!p)return;
+
+ if(room()<p.salary){
+  msg='Insufficient cap room.';
+  render();return;
+ }
+
+ s.roster.push(p);
+ s.freeAgents.splice(i,1);
+ s.news.unshift('Signed '+p.name);
+ msg='Contract signed: '+p.name;
+ save();render();
+}
+
+function draftPlayer(){
+ if(s.phase!==2)return;
+
+ const pick=s.picks
+  .filter(p=>p.year===s.year+1)
+  .sort((a,b)=>a.round-b.round)[0];
+
+ if(!pick){
+  s.draftRound=8;
+  msg='No remaining picks this draft.';
+  save();render();return;
+ }
+
+ const pos=$('draft-pos').value;
+ const ovr=rnd(65,84);
+ const salary=+(6.5/pick.round).toFixed(1);
+
+ if(room()<salary){
+  msg='Insufficient cap room for rookie.';
+  render();return;
+ }
+
+ const rookie=player(
+  'Rookie '+pos+' '+rnd(100,999),
+  pos,ovr,salary,4
+ );
+
+ s.roster.push(rookie);
+ s.picks=s.picks.filter(p=>p.id!==pick.id);
+
+ const remaining=s.picks.filter(
+  p=>p.year===s.year+1
+ );
+
+ s.draftRound=remaining.length
+  ?Math.min(...remaining.map(p=>p.round))
+  :8;
+
+ msg='Drafted '+rookie.name+
+  ' in Round '+pick.round+'.';
+ save();render();
+}
+
+function develop(){
+ if(![3,4,5].includes(s.phase))return;
+
+ const p=s.roster[rnd(0,s.roster.length-1)];
+ if(p){
+  p.ovr=clamp(p.ovr+1,40,99);
+  msg=p.name+' improved to '+p.ovr+' OVR.';
+ }
+ save();render();
+}
+
+function release(i){
+ if(!s.employed)return;
+
+ const p=s.roster[i];
+ if(!p)return;
+
+ if(!confirm('Release '+p.name+
+  '? Simulated dead cap applies.'))return;
+
+ s.deadCap+=p.salary*.35;
+ s.roster.splice(i,1);
+ s.morale=clamp(s.morale-2,0,100);
+
+ msg=p.name+' released.';
+ save();render();
+}
+
+function extend(i){
+ if(!s.employed)return;
+
+ const p=s.roster[i];
+ if(!p)return;
+
+ const extra=+(p.salary*.12).toFixed(1);
+
+ if(room()<extra){
+  msg='Insufficient cap room.';
+  render();return;
+ }
+
+ p.salary+=extra;
+ p.years+=2;
+ msg=p.name+' extended.';
+ save();render();
+}
+
+function phaseName(){
+ return PHASES[s.phase][0];
+}
+
+function scene(){
+ return `
+ <div class="office">
+  <div class="window">
+   <div class="sun"></div>
+   <div class="city"></div>
+   <div class="river"></div>
+   <div class="bridge"></div>
+  </div>
+
+  <div class="wall-title">
+   ${get(s.team)[1].toUpperCase()}
+   · EXECUTIVE SUITE
+  </div>
+
+  <div class="screen">${s.team}</div>
+  <div class="desk"></div>
+
+  <button class="office-hotspot hs-owner"
+   data-tab="Owner">🏛️ Owner</button>
+
+  <button class="office-hotspot hs-roster"
+   data-tab="Roster">📋 Roster</button>
+
+  <button class="office-hotspot hs-calendar"
+   data-tab="Calendar">📅 Calendar</button>
+
+  <button class="office-hotspot hs-draft"
+   data-tab="Draft">🏈 Draft</button>
+ </div>
+ <div class="office-label">
+  Interactive executive suite ·
+  ${s.team==='CIN'
+   ?'Cincinnati riverfront concept'
+   :'Franchise-themed concept'}
+ </div>`;
+}
+
+function office(){
+ const r=record(s.team);
+
+ return scene()+`
+ <div class="grid">
+  <div class="card stat">
+   <small>LEAGUE YEAR</small>
+   <b>${s.year}</b>
+  </div>
+  <div class="card stat">
+   <small>RECORD</small>
+   <b>${r.text}</b>
+  </div>
+  <div class="card stat">
+   <small>OWNER CONFIDENCE</small>
+   <b>${s.owner}%</b>
+  </div>
+  <div class="card stat">
+   <small>CAP ROOM · SIMULATED</small>
+   <b>${money(room())}</b>
+  </div>
+ </div>
+
+ <div class="card">
+  <h2>🗂️ GM Command Center</h2>
+  <h3>${phaseName()}</h3>
+  <p>${PHASES[s.phase][2]}</p>
+
+  <button class="primary" data-tab="Calendar">
+   Open League Calendar →
+  </button>
+
+  <div class="notice">
+   Roster needs:
+   ${needs().slice(0,3).map(n=>
+    n.pos+' ('+n.need+')').join(' · ')}
+  </div>
+
+  <div class="actions">
+   <button data-tab="Free Agency">
+    💰 Free Agency
+   </button>
+   <button data-tab="Draft">
+    🏈 Draft Room
+   </button>
+   <button data-tab="Roster">
+    📋 Roster
+   </button>
+   <button data-tab="League">
+    🌎 League
+   </button>
+  </div>
+ </div>`;
+}
+
+function calendar(){
+ return `<div class="card">
+ <h2>📅 NFL League Calendar</h2>
+ <p class="warning">
+ This is a simulated NFL calendar.
+ Exact official dates, schedule and
+ postseason seeding are not yet implemented.
+ </p>
+
+ ${PHASES.map((p,i)=>`
+  <div class="line">
+   <span class="pill">
+    ${i===s.phase?'CURRENT':
+     i<s.phase?'COMPLETE':'UPCOMING'}
+   </span>
+   <h3>${p[0]}</h3>
+   <small>${p[1]}</small>
+   <p>${p[2]}</p>
+  </div>
+ `).join('')}
+
+ ${s.phase===6?`
+  <h3>Regular Season · Week ${s.week}</h3>
+  <button class="primary" data-act="week">
+   Simulate Week ${s.week}
+  </button>
+ `:s.phase===7?`
+  <button class="primary" data-act="playoffs">
+   Simulate Playoff Round
+  </button>
+ `:`
+  <button class="primary" data-act="advance">
+   ${s.phase===8
+    ?'Complete Season Review'
+    :'Advance to Next Phase'} →
+  </button>
+ `}
+ </div>`;
+}
+
+function roster(){
+ return `<div class="card">
+ <h2>📋 Personnel Department</h2>
+
+ <p class="warning">
+ Cincinnati's initial roster uses a
+ limited set of recognizable names.
+ Ratings and financial figures are
+ fictional. Other franchises use
+ placeholder players.
+ </p>
+
+ <h3>Position Needs</h3>
+ <div class="grid">
+ ${needs().map(n=>`
+  <div class="card">
+   <b>${n.pos}</b>
+   <small>
+    ${n.count} rostered ·
+    Need ${n.need}
+   </small>
+  </div>
+ `).join('')}
+ </div>
+
+ <h3>Active Personnel</h3>
+ ${s.roster.map((p,i)=>`
+  <div class="line">
+   <b>${p.name}</b>
+   <span class="pill">${p.pos}</span>
+   <p class="muted">
+    ${p.ovr} OVR · ${money(p.salary)}
+    · ${p.years} years
+   </p>
+   <button data-act="extend" data-i="${i}">
+    Extend
+   </button>
+   <button data-act="cut" data-i="${i}">
+    Release
+   </button>
+  </div>
+ `).join('')}
+ </div>`;
+}
+
+function freeAgency(){
+ return `<div class="card">
+ <h2>💰 Free Agency</h2>
+ <p>Available cap:
+  <b>${money(room())}</b></p>
+ <p class="warning">
+ Fictional free-agent pool and simplified
+ contract negotiation model.
+ </p>
+
+ ${s.phase!==1?`
+  <div class="notice">
+   Free-agent signing window is closed.
+   Advance to March to sign players.
+  </div>
+ `:''}
+
+ ${s.freeAgents.map((p,i)=>`
+  <div class="line">
+   <b>${p.name}</b>
+   <span class="pill">${p.pos}</span>
+   <p class="muted">
+    OVR ${p.ovr} ·
+    ${money(p.salary)} per season ·
+    ${p.years} years
+   </p>
+   <button data-act="sign" data-i="${i}"
+    ${s.phase!==1?'disabled':''}>
+    Sign Contract
+   </button>
+  </div>
+ `).join('')}
+ </div>`;
+}
+
+function draft(){
+ const picks=[...s.picks].sort(
+  (a,b)=>a.year-b.year||
+  a.round-b.round
+ );
+
+ return `<div class="card">
+ <h2>🏈 Draft War Room</h2>
+ <p class="warning">
+ Draft prospects, ratings and selections
+ are simulated. Draft order and trade
+ compensation are not yet NFL-accurate.
+ </p>
+
+ <h3>Owned Draft Capital</h3>
+
+ ${picks.map(p=>`
+  <div class="line">
+   ${p.year} · Round ${p.round}
+   <small>
+    Original owner: ${get(p.origin)[1]}
+   </small>
+  </div>
+ `).join('')||'No draft picks owned.'}
+
+ <h3>Make a Selection</h3>
+
+ ${s.phase===2?`
+  <p>
+   Next available selection:
+   Round ${s.draftRound}
+  </p>
+  <select id="draft-pos">
+   ${POS.map(p=>`
+    <option>${p}</option>
+   `).join('')}
+  </select>
+  <button class="primary" data-act="draft">
+   Draft Player
+  </button>
+ `:`
+  <p class="muted">
+   The draft room opens in April.
+  </p>
+ `}
+ </div>`;
+}
+
+function season(){
+ const games=s.games.filter(g=>
+  g.home===s.team||g.away===s.team
+ );
+
+ return `<div class="card">
+ <h2>🏟️ Season Center</h2>
+ <p>Record: ${record(s.team).text}</p>
+
+ ${games.map(g=>`
+  <div class="line">
+   Week ${g.week}:
+   ${get(g.home)[1]} ${g.hs}
+   –
+   ${g.as} ${get(g.away)[1]}
+  </div>
+ `).join('')||'Season has not started.'}
+
+ ${s.phase===7?`
+  <div class="notice">
+   Playoffs in progress.
+  </div>
+ `:''}
+ </div>`;
+}
+
+function league(){
+ const standings=TEAMS.map(t=>({
+  team:t,
+  r:record(t[0])
+ })).sort((a,b)=>
+  b.r.w-a.r.w
+ );
+
+ return `<div class="card">
+ <h2>🌎 League Standings</h2>
+ ${standings.map(x=>`
+  <div class="line">
+   ${x.team[0]===s.team?'⭐ ':''}
+   ${x.team[1]}
+   <span class="pill">
+    ${x.r.text}
+   </span>
+  </div>
+ `).join('')}
+ </div>`;
+}
+
+function owner(){
+ return `<div class="card">
+ <h2>🏛️ Ownership Suite</h2>
+
+ <div class="grid">
+  <div class="card stat">
+   <small>CONFIDENCE</small>
+   <b>${s.owner}%</b>
+  </div>
+  <div class="card stat">
+   <small>REPUTATION</small>
+   <b>${s.reputation}%</b>
+  </div>
+ </div>
+
+ <p>
+ ${s.owner<35
+  ?'Your job is in serious danger.'
+  :s.owner<60
+  ?'Ownership wants improvement.'
+  :'Ownership supports your direction.'}
+ </p>
+
+ <p class="muted">
+  Poor performance can lead to dismissal
+  during the annual review.
+ </p>
+ </div>`;
+}
+
+function career(){
+ return `<div class="card">
+ <h2>🏆 GM Career</h2>
+ <p>
+  Status:
+  ${s.retired?'Retired':
+   s.employed?'Employed':'Fired'}
+ </p>
+
+ ${s.legacy.map(x=>`
+  <div class="line">
+   ${x.year} · ${get(x.team)[1]}
+   · ${x.record}
+   ${x.champion?'🏆 Champion':''}
+  </div>
+ `).join('')||'No completed seasons.'}
+
+ ${s.employed?`
+  <button data-act="resign">Resign</button>
+  <button data-act="retire">Retire</button>
+ `:''}
+
+ <div class="line">
+  <button data-act="new">New Career</button>
+  <p class="muted">
+   Replaces this Alpha 6.3 career only.
+  </p>
+ </div>
+ </div>`;
+}
+
+function choose(){
+ return `<div class="card">
+ <h2>🏈 Choose Your Franchise</h2>
+ <p>32 NFL franchises. One GM career.</p>
+
+ <select id="team-picker">
+ ${TEAMS.map(t=>`
+  <option value="${t[0]}"
+   ${t[0]===selected?'selected':''}>
+   ${t[1]}
+  </option>
+ `).join('')}
+ </select>
+
+ <div class="card">
+  <h2>${get(selected)[1]}</h2>
+  <p>
+   Your career begins in the
+   ${2026} league year.
+  </p>
+ </div>
+
+ <button class="primary" data-act="start">
+  Accept GM Position
+ </button>
+ </div>`;
+}
+
+function render(){
+ document.documentElement.style
+  .setProperty(
+   '--team',get(s?.team||selected)[2]
+  );
+
+ const tabs=[
+  'Office','Calendar','Roster',
+  'Free Agency','Draft','Season',
+  'League','Owner','Career'
+ ];
+
+ $('app').innerHTML=s?`
+  <nav>
+   ${tabs.map(t=>`
+    <button data-tab="${t}"
+     class="${tab===t?'active':''}">
+     ${t}
+    </button>
+   `).join('')}
+  </nav>
+
+  ${msg?`
+   <div class="notice">${msg}</div>
+  `:''}
+
+  ${({
+   Office:office,
+   Calendar:calendar,
+   Roster:roster,
+   'Free Agency':freeAgency,
+   Draft:draft,
+   Season:season,
+   League:league,
+   Owner:owner,
+   Career:career
+  })[tab]()}
+ `:choose();
+
+ document.querySelectorAll('[data-tab]')
+ .forEach(b=>b.onclick=()=>{
+  tab=b.dataset.tab;
+  msg='';
+  render();
+ });
+
+ document.querySelectorAll('[data-act]')
+ .forEach(b=>b.onclick=()=>{
+  const a=b.dataset.act;
+  const i=Number(b.dataset.i);
+
+  if(a==='start')newCareer(selected);
+  if(a==='advance')advance();
+  if(a==='week')simulateWeek();
+  if(a==='playoffs')simulatePlayoffs();
+  if(a==='sign')sign(i);
+  if(a==='draft')draftPlayer();
+  if(a==='extend')extend(i);
+  if(a==='cut')release(i);
+
+  if(a==='resign'&&confirm(
+   'Resign from this franchise?'
+  )){
+   s.employed=false;
+   msg='You resigned.';
+   save();render();
+  }
+
+  if(a==='retire'&&confirm(
+   'Retire your GM career?'
+  )){
+   s.employed=false;
+   s.retired=true;
+   msg='Your career has ended.';
+   save();render();
+  }
+
+  if(a==='new'&&confirm(
+   'Start a new career? This deletes only your Alpha 6.3 save.'
+  )){
+   localStorage.removeItem(KEY);
+   s=null;
+   selected='CIN';
+   tab='Office';
+   msg='';
+   render();
+  }
+ });
+
+ const picker=$('team-picker');
+ if(picker)picker.onchange=e=>{
+  selected=e.target.value;
+  render();
+ };
+}
+
+render();
+})();
+</script>
+</body>
+</html>
