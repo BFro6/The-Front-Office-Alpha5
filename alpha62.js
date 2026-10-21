@@ -671,8 +671,99 @@ function submit(){
  }
 
  save(s);
- close();
- location.reload();
+ save(s);
+
+const completedTrade = {
+  sent: p.name +
+    (sp ? ` + ${sp.year} Round ${sp.round} pick` : ''),
+  received,
+  partner: TEAMS.find(t => t[0] === partner)?.[1] || partner,
+  year: s.year,
+  week: s.week,
+  cap: capRoom(s)
+};
+
+close();
+
+const confirmation = document.createElement('div');
+confirmation.id = 'trade-confirmation';
+confirmation.style.cssText = `
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  overflow-y:auto;
+  background:#070d17f5;
+  padding:20px;
+  color:white;
+  font-family:system-ui,sans-serif;
+`;
+
+confirmation.innerHTML = `
+  <div style="
+    max-width:550px;
+    margin:35px auto;
+    padding:25px;
+    background:#182638;
+    border:2px solid #fb4f14;
+    border-radius:20px;
+  ">
+    <h1 style="color:#68d9a2">
+      ✓ TRADE COMPLETED
+    </h1>
+
+    <p>Season ${completedTrade.year}
+    · Week ${completedTrade.week}</p>
+
+    <div style="
+      background:#25374c;
+      padding:18px;
+      border-radius:12px;
+      margin:15px 0;
+    ">
+      <small>CINCINNATI RECEIVES</small>
+      <h2>${esc(completedTrade.received)}</h2>
+    </div>
+
+    <div style="
+      background:#25374c;
+      padding:18px;
+      border-radius:12px;
+      margin:15px 0;
+    ">
+      <small>${esc(completedTrade.partner.toUpperCase())} RECEIVES</small>
+      <h2>${esc(completedTrade.sent)}</h2>
+    </div>
+
+    <p>Updated simulated cap room:
+      <strong>$${completedTrade.cap.toFixed(1)}M</strong>
+    </p>
+
+    <p style="color:#b8c6d8">
+      Transaction finalized. Roster and draft
+      assets have been updated.
+    </p>
+
+    <button id="trade-return" style="
+      width:100%;
+      padding:16px;
+      background:#fb4f14;
+      color:white;
+      border:0;
+      border-radius:12px;
+      font-size:17px;
+      font-weight:bold;
+    ">
+      Return to Roster →
+    </button>
+  </div>
+`;
+
+document.body.append(confirmation);
+
+document.getElementById('trade-return').onclick = () => {
+  confirmation.remove();
+  location.reload();
+};
 }
 
 // Intercept Alpha 6.1's old Trade button
