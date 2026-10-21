@@ -1,0 +1,59 @@
+name: Build The Front Office roster edition
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 12 * * *'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download, validate and embed NFL rosters
+        run: |
+          python - <<'PY'
+          import csv, io, json, urllib.request, datetime, pathlib, re
+          source='https://github.com/nflverse/nflverse-data/releases/download/rosters/roster_2026.csv'
+          request=urllib.request.Request(source,headers={'User-Agent':'TheFrontOffice-RosterBuilder/1.0'})
+          with urllib.request.urlopen(request,timeout=90) as resp:
+              data=resp.read().decode('utf-8-sig')
+          rows=list(csv.DictReader(io.StringIO(data)))
+          teams={'ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LA','LAC','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS','LAR'}
+          selected=[r for r in rows if r.get('season','2026')=='2026' and r.get('team') in teams and r.get('full_name')]
+          teamset={r['team'] for r in selected}
+          normalized={'LA' if t=='LAR' else t for t in teamset}
+          if len(selected)<1500 or len(normalized)!=32:
+              raise RuntimeError(f'Roster data incomplete: {len(selected)} rows, {len(normalized)} teams. Refusing to publish.')
+          source_html=pathlib.Path('alpha74.html').read_text(encoding='utf-8')
+          snapshot_date=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+          # Embed a dated roster CSV in the page itself: no browser cross-origin fetch required.
+          embedded='<script>window.__FO_BUNDLED_ROSTER__='+json.dumps({'csv':data,'date':snapshot_date,'count':len(selected)},ensure_ascii=False).replace('</','<\\/')+';</script>\n'
+          html=source_html.replace('<script>\n(()=>',embedded+'<script>\n(()=>',1)
+          if html==source_html:raise RuntimeError('Cannot find the Alpha 7.4 script entry point')
+          html=html.replace('ALPHA 7.4 · REAL ROSTER IMPORT + SOCIAL PULSE 2.0','ALPHA 7.4.1 · BUNDLED ROSTERS + SOCIAL PULSE 2.0')
+          html=html.replace('Alpha 7.4 is a fictional gameplay prototype','Alpha 7.4.1 includes a dated nflverse roster snapshot; ratings and contracts remain simulated. This is a fictional gameplay prototype')
+          html=html.replace("const KEY='frontoffice_alpha74_v1'","const KEY='frontoffice_alpha741_v1'")
+          html=html.replace("if(!confirm('Import '+players.length+' players across 32 teams? This resets ONLY this Alpha 7.4 career. All ratings and contracts will be simulated placeholders.'))return;", "if(!auto && !confirm('Import '+players.length+' players across 32 teams? This resets ONLY this Alpha 7.4.1 career. All ratings and contracts will be simulated placeholders.'))return;")
+          html=html.replace('async function importRosterText(text,source){','async function importRosterText(text,source,auto=false){')
+          html=html.replace("const team=(r.team||'').trim().toUpperCase();", "let team=(r.team||'').trim().toUpperCase();if(team==='LA')team='LAR';")
+          html=html.replace("function importedStatus(raw){let v=String(raw||'').toUpperCase();", "function importedStatus(raw){let v=String(raw||'').toUpperCase();if(!v||!['ACT','ACTIVE','INA','INACTIVE','PRA','PS','PRACTICE'].includes(v)&&!/(RES|IR|PUP|NFI|SUSP)/.test(v))return 'reserve';")
+          html=html.replace("function setupView(){return", "function setupView(){return")
+          html=html.replace('The online download requires an internet connection and the source to permit browser downloads. If it fails, use the CSV file picker below.', 'This edition includes a bundled roster snapshot; it does not require an external download. Optional manual CSV replacement is still available.')
+          html=html.replace("document.addEventListener('click',e=>", "document.addEventListener('click',e=>")
+          needle='save();render();\n})();'
+          if needle not in html:raise RuntimeError('Cannot find app startup point')
+          html=html.replace(needle,"save();render();if(window.__FO_BUNDLED_ROSTER__&&!s.rosterSource){const b=window.__FO_BUNDLED_ROSTER__;importRosterText(b.csv,'Bundled nflverse 2026 roster · packaged '+b.date,true)}\n})();")
+          # This is a bundled, dated snapshot, not proof of transaction-level freshness.
+          pathlib.Path('alpha741.html').write_text(html,encoding='utf-8')
+          print(f'Built alpha741.html with {len(selected)} roster rows, {len(normalized)} teams, packaged {snapshot_date}')
+          PY
+      - name: Commit playable build
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add alpha741.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update bundled 2026 NFL rosters'
+            git push
+          fi
