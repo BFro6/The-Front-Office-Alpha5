@@ -1,0 +1,398 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Front Office — Alpha 6</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#f5f6f9;background:#080d15;--accent:#fb4f14;--second:#111}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 90% 5%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 45%),#080d15}
+header{padding:22px 18px;border-bottom:3px solid var(--accent);background:#0a0e17c9}
+h1{font-size:25px;margin:0}
+h2{margin:0 0 12px;font-size:21px}
+small,.muted{color:#a9b6c8}
+main{max-width:920px;margin:auto;padding:15px}
+.card{background:#182333;border:1px solid #37465b;border-radius:16px;padding:17px;margin:13px 0;box-shadow:0 8px 22px #0003}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.stat b{display:block;font-size:26px;margin-top:4px}
+.stat small{font-size:11px}
+button,select{font:inherit;border-radius:10px;padding:13px;border:1px solid #526079;background:#29384b;color:white}
+button{cursor:pointer;font-weight:750}
+button.primary{background:var(--accent);border-color:var(--accent);color:white}
+button:disabled{opacity:.5}
+nav{display:flex;gap:7px;overflow:auto;padding:10px 0}
+nav button{white-space:nowrap}
+nav button.active{background:var(--accent);border-color:var(--accent)}
+.office{position:relative;overflow:hidden;height:230px;border-radius:15px;background:radial-gradient(circle at 80% 20%,color-mix(in srgb,var(--accent) 60%,#1c2939),transparent 62%),linear-gradient(150deg,#23374a,#09121f)}
+.glass{position:absolute;inset:13px 15px 50px;border:6px solid #435166;border-bottom:0;border-radius:9px 9px 0 0;background:linear-gradient(#243a55aa,#0e1b2faa)}
+.glass:before{content:"";position:absolute;top:0;bottom:0;left:49%;width:8px;background:#435166}
+.skyline{position:absolute;bottom:0;left:0;right:0;height:70px;background:#0b1b2b;clip-path:polygon(0 50%,8% 50%,8% 22%,15% 22%,15% 65%,22% 65%,22% 5%,30% 5%,30% 45%,40% 45%,40% 15%,48% 15%,48% 55%,57% 55%,57% 0,66% 0,66% 60%,76% 60%,76% 25%,86% 25%,86% 55%,100% 55%,100% 100%,0 100%)}
+.desk{position:absolute;bottom:8px;left:9%;width:82%;height:42px;background:linear-gradient(#8d5a36,#2b1b16);border-top:7px solid #a97848;border-radius:5px 5px 10px 10px}
+.monitor{position:absolute;bottom:52px;left:39%;width:24%;height:56px;border:5px solid #6c7b8a;background:#08101a;display:grid;place-items:center;font-weight:900;color:var(--accent)}
+.scene-label{position:absolute;top:23px;left:27px;right:27px;font-size:12px;letter-spacing:1.5px;font-weight:900;text-shadow:0 2px 5px #000}
+.office-caption{margin-top:12px}
+.office-caption strong{font-size:23px;display:block}
+.office-caption em{color:var(--accent);font-style:normal;font-weight:900}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.actions button{text-align:left;min-height:75px;background:#26374d}
+.actions button span{display:block;font-size:11px;color:#b9c8d9;margin-top:4px;font-weight:400}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:10px 4px;text-align:left;border-bottom:1px solid #39485c}
+section.scroll{overflow-x:auto}
+.tag{display:inline-block;padding:4px 8px;border-radius:7px;background:#29384b;font-size:12px}
+.banner{padding:10px 12px;border-left:3px solid var(--accent);background:#101b2b;border-radius:5px;margin:10px 0}
+select{width:100%}
+a{color:#fbbd91}
+p{line-height:1.55}
+</style>
+</head>
+<body>
+<header>
+<h1>🏈 THE FRONT OFFICE</h1>
+<small>ALPHA 6 · YOUR TEAM. YOUR DECISIONS. YOUR LEGACY.</small>
+</header>
+<main><div id="app"></div></main>
+<script>
+(()=>{
+'use strict';
+
+const KEY='frontoffice_alpha6_v1';
+
+const data=[
+['ARI','Arizona Cardinals','NFC West','#97233f','Rise Up Red Sea','Glendale desert skyline',74,75],
+['ATL','Atlanta Falcons','NFC South','#a71930','Rise Up','Atlanta skyline',78,76],
+['BAL','Baltimore Ravens','AFC North','#5a3a92','Ravens Flock','Baltimore harbor',87,86],
+['BUF','Buffalo Bills','AFC East','#00338d','Bills Mafia','Buffalo skyline',86,83],
+['CAR','Carolina Panthers','NFC South','#0085ca','Keep Pounding','Charlotte skyline',72,73],
+['CHI','Chicago Bears','NFC North','#c83803','Bear Down','Chicago lakefront',77,81],
+['CIN','Cincinnati Bengals','AFC North','#fb4f14','Welcome to The Jungle','Cincinnati riverfront',86,76],
+['CLE','Cleveland Browns','AFC North','#ff3c00','Dawg Pound','Cleveland lakefront',70,77],
+['DAL','Dallas Cowboys','NFC East','#003594','How ’Bout Them Cowboys','Dallas skyline',82,77],
+['DEN','Denver Broncos','AFC West','#fb4f14','Broncos Country','Rocky Mountain skyline',79,85],
+['DET','Detroit Lions','NFC North','#0076b6','One Pride','Detroit skyline',89,84],
+['GB','Green Bay Packers','NFC North','#203731','Go Pack Go','Green Bay',84,83],
+['HOU','Houston Texans','AFC South','#03202f','We Are Texans','Houston skyline',83,84],
+['IND','Indianapolis Colts','AFC South','#002c5f','For The Shoe','Indianapolis skyline',80,76],
+['JAX','Jacksonville Jaguars','AFC South','#008e97','DUUUVAL!','St. Johns River waterfront',80,77],
+['KC','Kansas City Chiefs','AFC West','#e31837','Chiefs Kingdom','Kansas City skyline',87,84],
+['LV','Las Vegas Raiders','AFC West','#888888','Just Win, Baby','Las Vegas Strip',72,73],
+['LAC','Los Angeles Chargers','AFC West','#0080c6','Bolt Up','Los Angeles skyline',84,83],
+['LAR','Los Angeles Rams','NFC West','#003594','Rams House','Los Angeles skyline',85,80],
+['MIA','Miami Dolphins','AFC East','#008e97','Fins Up','South Florida coast',79,75],
+['MIN','Minnesota Vikings','NFC North','#4f2683','SKOL','Minneapolis skyline',80,82],
+['NE','New England Patriots','AFC East','#002244','Do Your Job','New England coastline',78,79],
+['NO','New Orleans Saints','NFC South','#a99158','Who Dat','French Quarter',73,75],
+['NYG','New York Giants','NFC East','#0b2265','Big Blue','New York skyline',72,74],
+['NYJ','New York Jets','AFC East','#125740','J-E-T-S!','New York skyline',73,76],
+['PHI','Philadelphia Eagles','NFC East','#004c54','Fly, Eagles Fly','Philadelphia skyline',88,87],
+['PIT','Pittsburgh Steelers','AFC North','#d59b00','Here We Go','Pittsburgh rivers',76,85],
+['SF','San Francisco 49ers','NFC West','#aa0000','Faithful to the Bay','Bay Area',87,85],
+['SEA','Seattle Seahawks','NFC West','#002244','The 12s','Seattle waterfront',82,83],
+['TB','Tampa Bay Buccaneers','NFC South','#d50a0a','Fire the Cannons','Tampa waterfront',80,79],
+['TEN','Tennessee Titans','AFC South','#4b92db','Titan Up','Nashville skyline',70,73],
+['WAS','Washington Commanders','NFC East','#773141','Raise Hail','Washington monuments',83,77]
+];
+
+const byId=id=>data.find(t=>t[0]===id);
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+let state=null;
+let tab='Office';
+let preview='CIN';
+
+function rounds(){
+ let ids=data.map(t=>t[0]),out=[];
+ for(let r=0;r<17;r++){
+  let week=[];
+  for(let i=0;i<16;i++){
+   const a=ids[i],b=ids[31-i];
+   week.push(r%2?{home:a,away:b}:{home:b,away:a});
+  }
+  out.push(week);
+  ids.splice(1,0,ids.pop());
+ }
+ return [...out.slice(0,9),[],...out.slice(9)];
+}
+
+function fresh(team){
+ return {
+  version:1,
+  team,
+  week:1,
+  year:2026,
+  confidence:73,
+  morale:72,
+  scheme:'Balanced',
+  schedule:rounds(),
+  results:[]
+ };
+}
+
+try{
+ let s=JSON.parse(localStorage.getItem(KEY));
+ if(s?.version===1&&byId(s.team)&&s.schedule?.length===18&&Array.isArray(s.results))
+  state=s;
+}catch(e){}
+
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(state));}
+ catch(e){console.warn('Save unavailable',e);}
+}
+
+function record(id){
+ let w=0,l=0,t=0,pf=0,pa=0;
+ for(const g of state.results){
+  if(g.home!==id&&g.away!==id)continue;
+  const own=g.home===id?g.hs:g.as;
+  const opp=g.home===id?g.as:g.hs;
+  pf+=own;pa+=opp;
+  if(own>opp)w++;
+  else if(own<opp)l++;
+  else t++;
+ }
+ return {w,l,t,pf,pa,text:`${w}-${l}-${t}`};
+}
+
+function drive(off,def,scheme){
+ let edge=off-def;
+ let ag=scheme==='Aggressive';
+ let safe=scheme==='Ball control';
+ let roll=rand(1,100);
+ let td=clamp(17+edge*.55+(ag?4:0)-(safe?3:0),5,43);
+ let fg=clamp(16+edge*.1,7,27);
+ return roll<=td?7:roll<=td+fg?3:0;
+}
+
+function play(home,away,featured){
+ let h=byId(home),a=byId(away),hs=0,as=0;
+ for(let i=0;i<10;i++){
+  hs+=drive(
+   h[6]+(featured&&home===state.team?(state.morale-70)*.04:0),
+   a[7],
+   featured&&home===state.team?state.scheme:'Balanced'
+  );
+  as+=drive(
+   a[6]+(featured&&away===state.team?(state.morale-70)*.04:0),
+   h[7],
+   featured&&away===state.team?state.scheme:'Balanced'
+  );
+ }
+ for(let i=0;i<3&&hs===as;i++){
+  hs+=drive(h[6],a[7],'Balanced');
+  as+=drive(a[6],h[7],'Balanced');
+ }
+ return {home,away,hs,as,week:state.week};
+}
+
+function simulate(){
+ if(!state||state.week>18)return;
+ const fixtures=state.schedule[state.week-1];
+ let mine=null;
+ for(const g of fixtures){
+  const featured=g.home===state.team||g.away===state.team;
+  const result=play(g.home,g.away,featured);
+  state.results.push(result);
+  if(featured)mine=result;
+ }
+ if(mine){
+  let own=mine.home===state.team?mine.hs:mine.as;
+  let opp=mine.home===state.team?mine.as:mine.hs;
+  state.confidence=clamp(
+   state.confidence+(own>opp?3:own<opp?-4:0),0,100
+  );
+  state.morale=clamp(
+   state.morale+(own>opp?2:own<opp?-3:0),0,100
+  );
+ }
+ state.week++;
+ save();
+ render();
+}
+
+function theme(){
+ let t=byId(preview)||byId('CIN');
+ document.documentElement.style.setProperty('--accent',t[3]);
+}
+
+function officeScene(t){
+ return `
+ <div class="office">
+  <div class="glass"><div class="skyline"></div></div>
+  <div class="scene-label">${t[1].toUpperCase()} · EXECUTIVE SUITE</div>
+  <div class="monitor">${t[0]}</div>
+  <div class="desk"></div>
+ </div>
+ <div class="office-caption">
+  <strong>${t[1]}</strong>
+  <em>${t[4]}</em>
+  <div class="muted">${t[5]}</div>
+ </div>`;
+}
+
+function choose(){
+ return `<div class="card">
+ <h2>🏈 Choose your franchise</h2>
+ <p>Start a new GM career. Every team has its own identity, while simulated ratings are fictional.</p>
+ <label for="team-select">Franchise</label>
+ <select id="team-select">
+ ${data.map(t=>`<option value="${t[0]}" ${preview===t[0]?'selected':''}>${t[1]}</option>`).join('')}
+ </select>
+ <div id="preview-scene" style="margin-top:14px">
+ ${officeScene(byId(preview))}
+ </div>
+ <p class="muted">This is a new Alpha 6 career. Your original Alpha 5 save is untouched.</p>
+ <button class="primary" id="start">Accept GM Position →</button>
+ </div>`;
+}
+
+function nav(){
+ return `<nav>
+ ${['Office','Season','League','GM Desk'].map(t=>`
+ <button data-tab="${t}" class="${tab===t?'active':''}">${t}</button>
+ `).join('')}
+ </nav>`;
+}
+
+function office(){
+ let t=byId(state.team);
+ let r=record(state.team);
+ let g=state.schedule[state.week-1]?.find(g=>
+  g.home===state.team||g.away===state.team
+ );
+ let opp=g?byId(g.home===state.team?g.away:g.home):null;
+ let last=[...state.results].reverse().find(g=>
+  g.home===state.team||g.away===state.team
+ );
+
+ return `
+ ${officeScene(t)}
+ <div class="grid">
+  <div class="card stat"><small>SEASON</small><b>${state.year}</b></div>
+  <div class="card stat"><small>RECORD</small><b>${r.text}</b></div>
+  <div class="card stat"><small>OWNER CONFIDENCE</small><b>${state.confidence}%</b></div>
+  <div class="card stat"><small>TEAM MORALE</small><b>${state.morale}%</b></div>
+ </div>
+ <div class="card">
+  <h2>🗂️ GM Command Center</h2>
+  <p>Week ${state.week>18?'Complete':state.week} ·
+  ${opp?'Next: '+opp[1]:state.week===10?'League bye':'Regular season complete'}</p>
+  <p>Game plan: <b>${state.scheme}</b></p>
+  ${state.week<=18?'<button class="primary" id="sim">Simulate Next Week →</button>':''}
+  ${last?`<div class="banner">Latest: ${byId(last.home)[1]} ${last.hs} – ${last.as} ${byId(last.away)[1]}</div>`:''}
+  <div class="actions">
+   <button data-go="GM Desk">💼 GM Desk<span>Strategy and personnel roadmap</span></button>
+   <button data-go="League">🌎 League Intel<span>All 32 teams</span></button>
+   <button data-go="Season">🏟️ Season<span>Results and schedule</span></button>
+   <button id="owner">🏛️ Owner Meeting<span>Performance expectations</span></button>
+  </div>
+  <p id="owner-note" class="muted"></p>
+ </div>`;
+}
+
+function season(){
+ let games=state.results.filter(g=>
+  g.home===state.team||g.away===state.team
+ );
+ return `<div class="card">
+ <h2>🏟️ Season Center</h2>
+ <p class="muted">Fictional 17-game round robin, with a temporary league-wide Week 10 bye. Not the official NFL schedule.</p>
+ ${games.length?games.map(g=>`
+ <div class="banner">Week ${g.week} · ${byId(g.home)[1]} ${g.hs} – ${g.as} ${byId(g.away)[1]}</div>
+ `).join(''):'No games played yet.'}
+ </div>`;
+}
+
+function league(){
+ let sorted=data.map(t=>({...record(t[0]),team:t}))
+ .sort((a,b)=>
+  (b.w+b.t*.5)/(b.w+b.l+b.t||1)-
+  (a.w+a.t*.5)/(a.w+a.l+a.t||1)||b.w-a.w
+ );
+ return `<div class="card">
+ <h2>🌎 Living League</h2>
+ <p class="muted">All results are simulated. Every club plays once per active week.</p>
+ <section class="scroll"><table>
+ <thead><tr><th>Club</th><th>W-L-T</th><th>PF</th><th>PA</th></tr></thead>
+ <tbody>
+ ${sorted.map(r=>`
+ <tr>
+  <td>${r.team[0]===state.team?'⭐ ':''}${r.team[1]}</td>
+  <td>${r.text}</td>
+  <td>${r.pf}</td>
+  <td>${r.pa}</td>
+ </tr>`).join('')}
+ </tbody></table></section>
+ </div>`;
+}
+
+function desk(){
+ let t=byId(state.team);
+ return `<div class="card">
+ <h2>💼 ${t[1]} GM Desk</h2>
+ <p><span class="tag">ACTIVE FRANCHISE</span> ${t[1]}</p>
+ <label for="scheme">Offensive philosophy</label>
+ <select id="scheme">
+ ${['Balanced','Aggressive','Ball control'].map(s=>`
+ <option ${state.scheme===s?'selected':''}>${s}</option>
+ `).join('')}
+ </select>
+ <p class="muted">Aggressive play raises scoring upside and risk. Ball control favors safer possessions. No game outcome is predetermined.</p>
+ <div class="banner">📚 GM Academy: Real cap accounting needs salaries, prorated bonuses, guarantees, and future-year commitments. We're building that next rather than inventing contract figures.</div>
+ <p><b>Roster and contract transactions:</b> not enabled yet.</p>
+ <p><b>Current simulated strengths:</b> Offense ${t[6]} · Defense ${t[7]} (fictional game ratings).</p>
+ </div>`;
+}
+
+function render(){
+ theme();
+ let app=document.getElementById('app');
+ app.innerHTML=!state?choose():
+ nav()+(tab==='Office'?office():tab==='Season'?season():tab==='League'?league():desk());
+
+ const sel=document.getElementById('team-select');
+ if(sel)sel.onchange=e=>{
+  preview=e.target.value;
+  render();
+ };
+
+ const start=document.getElementById('start');
+ if(start)start.onclick=()=>{
+  state=fresh(preview);
+  tab='Office';
+  save();
+  render();
+ };
+
+ document.querySelectorAll('[data-tab],[data-go]').forEach(b=>
+  b.onclick=()=>{
+   tab=b.dataset.tab||b.dataset.go;
+   render();
+  }
+ );
+
+ const sim=document.getElementById('sim');
+ if(sim)sim.onclick=simulate;
+
+ const scheme=document.getElementById('scheme');
+ if(scheme)scheme.onchange=e=>{
+  state.scheme=e.target.value;
+  save();
+  render();
+ };
+
+ const owner=document.getElementById('owner');
+ if(owner)owner.onclick=()=>{
+  document.getElementById('owner-note').textContent=
+   `Ownership confidence: ${state.confidence}%. Your results influence job security. Full owner demands are planned for a later build.`;
+ };
+}
+
+if(state)preview=state.team;
+render();
+})();
+</script>
+</body>
+</html>
