@@ -545,10 +545,32 @@ function strength(id,side){
   .filter(n=>relevant.includes(n.pos))
   .reduce((n,x)=>n+x.need,0);
 
- return clamp(
-  avg-missing*1.4+(s.morale-70)*.07,
-  35,99
- );
+const readiness=group.length
+ ?group.reduce((n,p)=>
+   n+(typeof p.readiness==='number'
+     ?p.readiness:70),0
+  )/group.length
+ :70;
+
+const readinessEffect=(readiness-70)*.12;
+
+const wrDepth=s.camp?.depthChart?.WR||[];
+
+const depthBonus=side==='off'&&wrDepth.length
+ ?Math.min(2,wrDepth.slice(0,2)
+   .filter(id=>s.roster.some(p=>
+     p.id===id&&p.injury===0
+   )).length)
+ :0;
+
+return clamp(
+ avg
+ -missing*1.4
+ +(s.morale-70)*.07
+ +readinessEffect
+ +depthBonus,
+ 35,99
+);
 }
 
 function drive(off,def){
